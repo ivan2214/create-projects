@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Inicio",
@@ -24,6 +25,7 @@ export default async function RootLayout({
         <footer className="text-center leading-[4rem] opacity-70">
           Inicio
         </footer>
+        <Toaster />
       </body>
     </html>
   );

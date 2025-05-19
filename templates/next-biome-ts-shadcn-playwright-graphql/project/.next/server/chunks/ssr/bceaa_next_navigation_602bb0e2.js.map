@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/juanb/OneDrive/Desktop/Ivan/Dev/tools/create-projects/templates/next-biome-ts-shadcn-playwright-graphql/project/node_modules/.pnpm/next%4015.3.2_%40playwright%2Btes_11ef3c70f816038b1e7819c982d20629/node_modules/next/navigation.js"],"sourcesContent":["module.exports = require('./dist/client/components/navigation')\n"],"names":[],"mappings":"AAAA,OAAO,OAAO","ignoreList":[0],"debugId":null}}]
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ApolloWrapper } from "@/lib/apollo-wrapper";
 
 export const metadata: Metadata = {
   title: "Inicio",
@@ -21,7 +22,8 @@ export default async function RootLayout({
         <header className="text-xl leading-[4rem] font-bold">
           <Link href="/">Inicio</Link>
         </header>
-        {children}
+        <ApolloWrapper>{children}</ApolloWrapper>
+
         <footer className="text-center leading-[4rem] opacity-70">
           Inicio
         </footer>

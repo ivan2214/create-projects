@@ -23,7 +23,7 @@ export async function runCli() {
       type: "text",
       name: "name",
       message: "What is the name of your project?",
-      initial: initialName || "appncy-project",
+      initial: initialName || "my-project",
       validate: (value) =>
         value.match(/[^a-zA-Z0-9-_]+/g)
           ? "Only letters, numbers, dashes and underscores"

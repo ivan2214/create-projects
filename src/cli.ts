@@ -39,7 +39,7 @@ export async function runCli() {
 
   let extras: string[] = [];
 
-  if (EXTRAS[project.template]) {
+  if (EXTRAS[project.template] && EXTRAS[project.template].length > 0) {
     const { extras: selected } = await prompts({
       type: "multiselect",
       name: "extras",

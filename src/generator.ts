@@ -1,16 +1,18 @@
 import { glob } from "glob";
-import path from "path";
+import path from "node:path";
 import color from "picocolors";
 import ora from "ora";
 
 async function isDirectory(file: string): Promise<boolean> {
-  const fs = await import("fs/promises");
+  const fs = await import("node:fs/promises");
   const stat = await fs.stat(file);
   return stat.isDirectory();
 }
 
 async function ensureDir(dir: string) {
-  await import("fs/promises").then((fs) => fs.mkdir(dir, { recursive: true }));
+  await import("node:fs/promises").then((fs) =>
+    fs.mkdir(dir, { recursive: true })
+  );
 }
 
 async function copyFiles(
@@ -32,13 +34,13 @@ async function copyFiles(
         await ensureDir(dest);
       } else {
         await ensureDir(path.dirname(dest));
-        let data = await import("fs/promises").then((fs) =>
+        let data = await import("node:fs/promises").then((fs) =>
           fs.readFile(file, "utf8")
         );
         for (const [key, value] of Object.entries(variables)) {
           data = data.replace(new RegExp(`{{${key}}}`, "g"), value);
         }
-        await import("fs/promises").then((fs) => fs.writeFile(dest, data));
+        await import("node:fs/promises").then((fs) => fs.writeFile(dest, data));
       }
     }
   }
@@ -50,7 +52,7 @@ export async function generateProject(
   destination: string,
   extras: string[],
   variables: Record<string, string> = {},
-  packageManager: string = "pnpm"
+  packageManager = "pnpm"
 ) {
   const spinner = ora("Copiando archivos base...").start();
   try {
@@ -66,7 +68,7 @@ export async function generateProject(
       });
     }
     spinner.text = "Renombrando archivos...";
-    let files = await glob("**/*", {
+    const files = await glob("**/*", {
       cwd: destination,
       absolute: true,
       nodir: true,
@@ -75,7 +77,7 @@ export async function generateProject(
       const base = path.basename(file);
       if (base.startsWith("%%")) {
         const renamed = path.join(path.dirname(file), base.slice(2));
-        await import("fs/promises").then((fs) => fs.rename(file, renamed));
+        await import("node:fs/promises").then((fs) => fs.rename(file, renamed));
       }
     }
     spinner.succeed("Proyecto creado exitosamente");

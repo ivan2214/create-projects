@@ -1,8 +1,8 @@
 import prompts from "prompts";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import path from "path";
-import { fileURLToPath } from "url";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { TEMPLATES, EXTRAS } from "./templates";
 import { generateProject } from "./generator";
 

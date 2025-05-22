@@ -1,103 +1,98 @@
-import { cp, rename, readFile, writeFile } from "fs/promises";
 import { glob } from "glob";
 import path from "path";
 import color from "picocolors";
 import ora from "ora";
 
-export async function generateProject(
-  name: string,
-  template: string,
-  destination: string,
-  extras: string[]
+async function isDirectory(file: string): Promise<boolean> {
+  const fs = await import("fs/promises");
+  const stat = await fs.stat(file);
+  return stat.isDirectory();
+}
+
+async function ensureDir(dir: string) {
+  await import("fs/promises").then((fs) => fs.mkdir(dir, { recursive: true }));
+}
+
+async function copyFiles(
+  srcDir: string,
+  destDir: string,
+  variables: Record<string, string> = {}
 ) {
-  const spinner = ora("Copiando archivos base...").start();
-  // Copiar archivos base excluyendo node_modules
-  const baseFiles = await glob("**/*", {
-    cwd: path.join(template, "project"),
+  const files = await glob("**/*", {
+    cwd: srcDir,
     absolute: true,
     nodir: false,
     ignore: ["node_modules/**"],
   });
-  for (const file of baseFiles) {
-    const rel = path.relative(path.join(template, "project"), file);
+  for (const file of files) {
+    const rel = path.relative(srcDir, file);
     if (!rel.startsWith("node_modules")) {
-      const dest = path.join(destination, rel);
-      const stat = await import("fs/promises").then((fs) => fs.stat(file));
-      if (stat.isDirectory()) {
-        await import("fs/promises").then((fs) =>
-          fs.mkdir(dest, { recursive: true })
-        );
+      const dest = path.join(destDir, rel);
+      if (await isDirectory(file)) {
+        await ensureDir(dest);
       } else {
-        // Asegurar que el directorio padre existe antes de copiar
-        await import("fs/promises").then((fs) =>
-          fs.mkdir(path.dirname(dest), { recursive: true })
+        await ensureDir(path.dirname(dest));
+        let data = await import("fs/promises").then((fs) =>
+          fs.readFile(file, "utf8")
         );
-        await import("fs/promises").then((fs) => fs.copyFile(file, dest));
-      }
-    }
-  }
-  spinner.text = "Agregando extras...";
-  for await (const extra of extras) {
-    const extraFiles = await glob("**/*", {
-      cwd: path.join(template, "extras", extra),
-      absolute: true,
-      nodir: false,
-      ignore: ["node_modules/**"],
-    });
-    for (const file of extraFiles) {
-      const rel = path.relative(path.join(template, "extras", extra), file);
-      if (!rel.startsWith("node_modules")) {
-        const dest = path.join(destination, rel);
-        const stat = await import("fs/promises").then((fs) => fs.stat(file));
-        if (stat.isDirectory()) {
-          await import("fs/promises").then((fs) =>
-            fs.mkdir(dest, { recursive: true })
-          );
-        } else {
-          // Asegurar que el directorio padre existe antes de copiar
-          await import("fs/promises").then((fs) =>
-            fs.mkdir(path.dirname(dest), { recursive: true })
-          );
-          await import("fs/promises").then((fs) => fs.copyFile(file, dest));
+        for (const [key, value] of Object.entries(variables)) {
+          data = data.replace(new RegExp(`{{${key}}}`, "g"), value);
         }
+        await import("fs/promises").then((fs) => fs.writeFile(dest, data));
       }
     }
   }
-  spinner.text = "Renombrando archivos...";
-  let files = await glob("**/*", {
-    cwd: destination,
-    absolute: true,
-    nodir: true,
-  });
-  for (const file of files) {
-    const base = path.basename(file);
-    if (base.startsWith("%%")) {
-      const renamed = path.join(path.dirname(file), base.slice(2));
-      await rename(file, renamed);
+}
+
+export async function generateProject(
+  name: string,
+  template: string,
+  destination: string,
+  extras: string[],
+  variables: Record<string, string> = {},
+  packageManager: string = "pnpm"
+) {
+  const spinner = ora("Copiando archivos base...").start();
+  try {
+    await copyFiles(path.join(template, "project"), destination, {
+      name,
+      ...variables,
+    });
+    spinner.text = "Agregando extras...";
+    for await (const extra of extras) {
+      await copyFiles(path.join(template, "extras", extra), destination, {
+        name,
+        ...variables,
+      });
     }
-  }
-  spinner.text = "Personalizando archivos...";
-  files = await glob("**/*", {
-    cwd: destination,
-    absolute: true,
-    nodir: true,
-  });
-  for (const file of files) {
-    const data = await readFile(file, "utf8");
-    const replaced = data.replace(/{{name}}/g, name);
-    await writeFile(file, replaced);
-  }
-  spinner.succeed("Proyecto creado exitosamente");
-  // Final logs
-  console.log("\n✨ Project created ✨\n");
-  console.log(`${color.green("cd")} ${name}`);
-  console.log(`${color.green("pnpm")} install`);
-  console.log(`${color.green("pnpm")} dev`);
-  if (extras.length) {
-    console.log(
-      `\nCheck out ${color.italic(
-        extras.map((e) => `${e.toUpperCase()}.md`).join(", ")
-      )}`
-    );
+    spinner.text = "Renombrando archivos...";
+    let files = await glob("**/*", {
+      cwd: destination,
+      absolute: true,
+      nodir: true,
+    });
+    for (const file of files) {
+      const base = path.basename(file);
+      if (base.startsWith("%%")) {
+        const renamed = path.join(path.dirname(file), base.slice(2));
+        await import("fs/promises").then((fs) => fs.rename(file, renamed));
+      }
+    }
+    spinner.succeed("Proyecto creado exitosamente");
+    console.log("\n✨ Project created ✨\n");
+    console.log(`${color.green("cd")} ${name}`);
+    console.log(`${color.green(packageManager)} install`);
+    console.log(`${color.green(packageManager)} dev`);
+    if (extras.length) {
+      console.log(
+        `\nCheck out ${color.italic(
+          extras.map((e) => `${e.toUpperCase()}.md`).join(", ")
+        )}`
+      );
+    }
+  } catch (e) {
+    spinner.fail("Error al crear el proyecto");
+    console.error(e);
+    throw e;
   }
 }

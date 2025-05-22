@@ -1,30 +1,30 @@
 interface Template {
-  title: string;
-  value: string;
+	title: string;
+	value: string;
 }
 
 export const TEMPLATES: Template[] = [
-  {
-    title: "Next.js + Biome + TS + Shadcn + Playwright",
-    value: "next-biome-ts-shadcn-playwright",
-  },
-  {
-    title: "Next.js + Biome + TS + Shadcn + Playwright + GraphQL",
-    value: "next-biome-ts-shadcn-playwright-graphql",
-  },
+	{
+		title: "Next.js + Biome + TS + Shadcn + Playwright",
+		value: "next-biome-ts-shadcn-playwright",
+	},
+	{
+		title: "Next.js + Biome + TS + Shadcn + Playwright + GraphQL",
+		value: "next-biome-ts-shadcn-playwright-graphql",
+	},
 ];
 
 interface Extra {
-  title: string;
-  value: string;
+	title: string;
+	value: string;
 }
 
 interface Extras {
-  [key: string]: Extra[];
+	[key: string]: Extra[];
 }
 
 export const EXTRAS: Extras = {
-  /* "next-biome-ts-shadcn-playwright": [
+	/* "next-biome-ts-shadcn-playwright": [
     { title: "Mercado Pago", value: "mercadopago" },
     { title: "Supabase", value: "supabase" },
   ], */

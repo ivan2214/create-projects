@@ -1,4 +1,4 @@
-## Getting Started with next-biome-ts-shadcn-playwright-bettet-auth-prisma
+## Getting Started with {{name}}
 
 First, run the development server:
 

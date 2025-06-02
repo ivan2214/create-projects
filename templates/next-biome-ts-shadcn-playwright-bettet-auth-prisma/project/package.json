@@ -1,5 +1,5 @@
 {
-  "name": "next-biome-ts-shadcn-playwright-bettet-auth-prisma",
+  "name": "{{name}}",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,18 @@
     "start": "next start",
     "check": "biome check --write",
     "check:fix": "biome check --fix",
-    "test": "pnpm exec playwright test --ui"
+    "db:push": "prisma db push",
+		"db:studio": "prisma studio",
+		"db:dev": "prisma migrate dev --name $npm_config_name",
+		"db:reset": "prisma migrate reset",
+		"db:seed": "pnpm prisma db seed",
+    "test": "pnpm exec playwright test --ui",
+		"typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate --no-engine"
   },
+  "prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
   "dependencies": {
     "@better-fetch/fetch": "^1.1.18",
     "@hookform/resolvers": "^5.0.1",
@@ -42,6 +52,7 @@
     "@types/react-dom": "^19",
     "prisma": "^6.8.2",
     "tailwindcss": "^4",
+    "tsx": "^4.19.4",
     "tw-animate-css": "^1.3.0",
     "typescript": "^5"
   }

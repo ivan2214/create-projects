@@ -5,6 +5,10 @@ interface Template {
 
 export const TEMPLATES: Template[] = [
 	{
+		title: "Next.js + Biome + TS + Shadcn + Playwright + Bettet Auth + Prisma",
+		value: "next-biome-ts-shadcn-playwright-bettet-auth-prisma",
+	},
+	{
 		title: "Next.js + Biome + TS + Shadcn + Playwright",
 		value: "next-biome-ts-shadcn-playwright",
 	},

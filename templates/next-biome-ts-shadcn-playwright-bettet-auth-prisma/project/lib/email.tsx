@@ -1,14 +1,13 @@
-import { env } from "@/env";
 import { render } from "@react-email/components";
 import nodemailer from "nodemailer";
 
-import { EmailTemplateVerifyResetPassword } from "@/components/email-template-verify-reset-password";
+import { EmailTemplate } from "@/components/email-template";
 
 export const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
-		user: env.EMAIL_USER,
-		pass: env.EMAIL_PASS,
+		user: process.env.EMAIL_USER,
+		pass: process.env.EMAIL_PASS,
 	},
 	secure: true,
 });
@@ -16,23 +15,33 @@ export const transporter = nodemailer.createTransport({
 export async function sendEmail({
 	to,
 	subject,
-	resetPasswordLink,
+	description,
+	buttonText,
+	buttonUrl,
+	title,
 	userFirstname,
 }: {
 	to: string;
 	subject: string;
-	resetPasswordLink: string;
-	userFirstname?: string;
+	description: string;
+	buttonText: string;
+	buttonUrl: string;
+	title: string;
+	userFirstname: string;
 }) {
 	const html = await render(
-		<EmailTemplateVerifyResetPassword
-			resetPasswordLink={resetPasswordLink}
+		<EmailTemplate
+			appName="Empleos Lules"
+			description={description}
+			buttonText={buttonText}
+			buttonUrl={buttonUrl}
+			title={title}
 			userFirstname={userFirstname}
 		/>,
 	);
 
 	await transporter.sendMail({
-		from: env.EMAIL_FROM,
+		from: process.env.EMAIL_FROM,
 		to,
 		subject,
 		html,

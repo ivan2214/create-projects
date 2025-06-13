@@ -1,7 +1,7 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-interface UseAsyncActionOptions<T = any> {
+interface UseAsyncActionOptions<T> {
   onSuccess?: (data: T) => void;
   onError?: (error: string) => void;
   onFinish?: () => void;
@@ -9,7 +9,7 @@ interface UseAsyncActionOptions<T = any> {
   errorMessage?: string;
 }
 
-export function useAsyncAction<T = any>(
+export function useAsyncAction<T>(
   options: UseAsyncActionOptions<T> = {},
 ) {
   const [isPending, startTransition] = useTransition();

@@ -15,6 +15,8 @@ import { redirect } from "next/navigation";
 
 export interface StateLogin {
 	errorMessage?: string | null;
+	verifyEmail?: boolean;
+	success?: boolean;
 }
 
 export async function loginAction(
@@ -35,22 +37,37 @@ export async function loginAction(
 				email,
 				password,
 			},
-		});
+		})
+
+		return {
+			success: true,
+		};
+
 	} catch (error) {
+		console.log(error);
+
 		if (error instanceof APIError) {
 			switch (error.status) {
+				case "UNPROCESSABLE_ENTITY":
+					return { errorMessage: "Email o contraseña incorrectos." };
+				case "FORBIDDEN":
+					return {
+						errorMessage: "Confirmar tu cuenta antes de ingresar.",
+						verifyEmail: true,
+					};
 				case "UNAUTHORIZED":
-					return { errorMessage: "User Not Found." };
+					return { errorMessage: "Email o contraseña incorrectos." };
 				case "BAD_REQUEST":
-					return { errorMessage: "Invalid email." };
+					return { errorMessage: "Email invalido." };
 				default:
-					return { errorMessage: "Something went wrong." };
+					return { errorMessage: "Algo salio mal." };
 			}
 		}
 		console.error("sign in with email has not worked", error);
 		throw error;
-	} finally {
-		redirect("/profile");
+	}
+	finally {
+		revalidatePath("/");
 	}
 }
 
@@ -103,6 +120,9 @@ export async function registerAction(
 				},
 			});
 		}
+		return {
+			errorMessage: "",
+		}
 	} catch (error) {
 		if (error instanceof APIError) {
 			switch (error.status) {
@@ -115,6 +135,7 @@ export async function registerAction(
 			}
 		}
 		console.error("sign up with email and password has not worked", error);
+		return { errorMessage: "Something went wrong." };
 	} finally {
 		redirect("/profile");
 	}

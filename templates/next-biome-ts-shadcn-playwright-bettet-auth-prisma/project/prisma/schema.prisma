@@ -15,15 +15,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String   @id @default(uuid())
+  email         String   @unique
   name          String?
-  emailVerified Boolean
+  emailVerified Boolean? @default(false)
   image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  // Enums
+  roleUser RoleUser @default(USER)
+
+  // Relations
+  sessions Session[]
+  accounts Account[]
 
   @@map("user")
 }
@@ -71,4 +76,9 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+enum RoleUser {
+  USER
+  ADMIN
 }

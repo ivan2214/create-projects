@@ -20,12 +20,31 @@ export const auth = betterAuth({
 			await sendEmail({
 				to: user.email,
 				subject: "Reset your password",
-				resetPasswordLink: url,
+				buttonUrl: url,
 				userFirstname: user.name,
+				title: "Reset your password",
+				description: "Please click the button to reset your password",
+				buttonText: "Reset password",
 			});
 		},
 		resetPasswordTokenExpiresIn: 3600,
 	},
+	/* emailVerification: {
+		sendVerificationEmail(data) {
+			return sendEmail({
+				to: data.user.email, // esto es el email del usuario
+				subject: "Verify your email", // esto es el asunto
+				buttonUrl: data.url, // esto es el link
+				userFirstname: data.user.name, // esto es el nombre
+				title: "Verify your email",
+				description: "Please click the button to verify your email",
+				buttonText: "Verify email",
+			});
+		},
+		sendOnSignUp: true,
+		autoSignInAfterVerification: false,
+		expiresIn: 3600,
+	}, */
 	socialProviders: {
 		github: {
 			clientId: process.env.AUTH_GITHUB_ID as string,

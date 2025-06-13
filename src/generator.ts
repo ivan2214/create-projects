@@ -71,15 +71,17 @@ export async function generateProject(
 		const files = await glob("**/*", {
 			cwd: destination,
 			absolute: true,
-			nodir: true,
+			nodir: false,
+			mark: true,
 		});
-		for (const file of files) {
+		for (const file of files.sort((a, b) => b.split(path.sep).length - a.split(path.sep).length)) {
 			const base = path.basename(file);
 			if (base.startsWith("%%")) {
 				const renamed = path.join(path.dirname(file), base.slice(2));
 				await import("node:fs/promises").then((fs) => fs.rename(file, renamed));
 			}
 		}
+
 		spinner.succeed("Proyecto creado exitosamente");
 		console.log("\n✨ Project created ✨\n");
 		console.log(`${color.green("cd")} ${name}`);
